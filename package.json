@@ -1,0 +1,33 @@
+{
+  "name": "osukeyboardsounds",
+  "productName": "osukeyboardsounds",
+  "version": "1.0.0",
+  "description": "Osu keyboard sounds on your desktop!",
+  "main": "src/index.js",
+  "keywords": [],
+  "author": {
+    "name": "Kıraç Armağan Önal",
+    "email": "kiracarmaganonal@gmail.com"
+  },
+  "license": "GNU GLP v3",
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
+    "express": "^4.17.1",
+    "iohook": "^0.7.2"
+  },
+  "devDependencies": {
+    "electron": "^11.2.1"
+  },
+  "iohook": {
+    "targets": [
+      "node-72",
+      "electron-75"
+    ],
+    "platforms": [
+      "win32"
+    ],
+    "arches": [
+      "x64"
+    ]
+  }
+}
