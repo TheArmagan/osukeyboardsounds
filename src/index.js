@@ -68,7 +68,6 @@ app.on('ready', () => {
 
   iohook.on("keydown", (eventData) => {
     mainWindow.webContents.send("keydown", eventData);
-    console.log(eventData);
   })
   iohook.start();
 

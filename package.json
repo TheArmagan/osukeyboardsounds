@@ -4,6 +4,12 @@
   "version": "1.0.0",
   "description": "Osu keyboard sounds on your desktop!",
   "main": "src/index.js",
+  "scripts": {
+    "postinstall": "electron-builder install-app-deps",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "start": "electron ."
+  },
   "keywords": [],
   "author": {
     "name": "Kıraç Armağan Önal",
@@ -16,7 +22,8 @@
     "iohook": "^0.7.2"
   },
   "devDependencies": {
-    "electron": "^11.2.1"
+    "electron": "^11.2.1",
+    "electron-builder": "^22.9.1"
   },
   "iohook": {
     "targets": [
@@ -29,5 +36,11 @@
     "arches": [
       "x64"
     ]
+  },
+  "build": {
+    "productName": "Osu Keyboard Sounds",
+    "appId": "com.thearmagan.osukeyboardsounds",
+    "copyright": "Copyright © 2021 Kıraç Armağan Önal",
+    "asarUnpack": "**/*.node"
   }
 }
