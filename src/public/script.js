@@ -16,31 +16,29 @@ ipcRenderer.on("isActive", (_, state) => {
   isActive = state;
 })
 
-ipcRenderer.on("keydown", (_, eventData) => {
+ipcRenderer.on("keydown", (_, keyCode) => {
   if (!isActive) return;
-  switch (eventData.keycode) {
-    case 58: // Caps
+  switch (keyCode) {
+    case 20: // Caps
       sounds.keyCaps.play();
       break;
-    case 14: // Delete
+    case 8: // Delete
       sounds.keyDelete.play();
       break;
-    case 61000: // Arrow keys
-    case 61008:
-    case 61003:
-    case 61005:
+    case 40: // Arrow keys
+    case 39:
+    case 38:
+    case 37:
       sounds.keyMovement.play();
       break;
-    case 28: // Enter key
+    case 13: // Enter key
       sounds.keyConfirm.play();
       break;
-    case 20:
-    case 56:
-    case 42: // ctrl, shift etc..
-    case 29:
-    case 3640:
+    case 160:
+    case 162:
+    case 164: // ctrl, shift etc..
+    case 165:
       break;
-
     default: // Other all keys
       sounds[`keyPress${getRandomInt(1, 4)}`].play();
       break;

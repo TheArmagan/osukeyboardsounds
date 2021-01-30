@@ -1,6 +1,6 @@
 const { app, BrowserWindow, Menu, Tray, Notification } = require('electron');
 const path = require('path');
-const iohook = require("iohook");
+const globalUserInput = require("globaluserinput");
 const express = require("express");
 const expressApp = express();
 
@@ -30,8 +30,7 @@ app.on('ready', () => {
     webPreferences: {
       nodeIntegration: true,
       autoplayPolicy: "no-user-gesture-required"
-    },
-    icon: path.resolve(__dirname, "icon.ico")
+    }
   });
 
   mainWindow.loadURL("http://127.0.0.1:8434");
@@ -66,10 +65,13 @@ app.on('ready', () => {
   tray.setToolTip("Osu Keyboard Sounds");
   tray.setContextMenu(contextMenu);
 
-  iohook.on("keydown", (eventData) => {
-    mainWindow.webContents.send("keydown", eventData);
+  globalUserInput.events.on("data", (eventData) => {
+    if (eventData.event == "keyboardStateChange" && eventData.keyState == "Down") {
+      mainWindow.webContents.send("keydown", eventData.keyCode);
+    }
+
   })
-  iohook.start();
+  globalUserInput.listen();
 
   showNotification("Hey i am at application tray!");
 });
