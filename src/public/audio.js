@@ -10,14 +10,7 @@ for (let i = 0; i < soundFiles.length; i++) {
   });
 }
 
-let isActive = true;
-
-ipcRenderer.on("isActive", (_, state) => {
-  isActive = state;
-})
-
 ipcRenderer.on("keydown", (_, keyCode) => {
-  if (!isActive) return;
   switch (keyCode) {
     case 20: // Caps
       sounds.keyCaps.play();
@@ -43,7 +36,11 @@ ipcRenderer.on("keydown", (_, keyCode) => {
       sounds[`keyPress${getRandomInt(1, 4)}`].play();
       break;
   }
-})
+});
+
+ipcRenderer.on("settings", async (_, conf) => {
+  Howler.volume(conf.volume);
+});
 
 
 function getRandomInt(min, max) {

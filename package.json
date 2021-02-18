@@ -19,8 +19,7 @@
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
     "express": "^4.17.1",
-    "globaluserinput": "^0.1.2",
-    "keycode": "^2.2.0"
+    "globaluserinput": "^1.0.0"
   },
   "devDependencies": {
     "electron": "^11.2.1",

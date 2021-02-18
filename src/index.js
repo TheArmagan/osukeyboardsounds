@@ -1,8 +1,9 @@
-const { app, BrowserWindow, Menu, Tray, Notification } = require('electron');
+const { app, BrowserWindow, Tray, Notification } = require('electron');
 const path = require('path');
 const globalUserInput = require("globaluserinput");
 const express = require("express");
 const expressApp = express();
+const { ipcMain } = require("electron");
 
 expressApp.listen(8434);
 expressApp.use(express.static(path.resolve(__dirname, "public")));
@@ -11,73 +12,80 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
+
+/** @type {Tray} */
+let tray = null;
+/** @type {BrowserWindow} */
+let audioWindow = null;
+/** @type {BrowserWindow} */
+let settingsWindow = null;
 app.on('ready', () => {
-  let isActive = true;
-
-  function setIsActive(status) {
-    isActive = status;
-    mainWindow.webContents.send("isActive", status);
-    return status;
-  }
-
-  const mainWindow = new BrowserWindow({
+  audioWindow = new BrowserWindow({
     width: 1,
     height: 1,
     x: 0,
     y: 0,
-    title: "Osu Keyboard Sounds",
+    title: "Osu Keyboard Sounds - Audio",
     darkTheme: true,
     webPreferences: {
       nodeIntegration: true,
-      autoplayPolicy: "no-user-gesture-required"
+      autoplayPolicy: "no-user-gesture-required",
+      contextIsolation: false
     }
   });
 
-  mainWindow.loadURL("http://127.0.0.1:8434");
-  mainWindow.hide();
+  audioWindow.loadURL("http://127.0.0.1:8434/audio.html");
+  audioWindow.hide();
 
-  const tray = new Tray(path.resolve(__dirname, "icon.ico"))
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: "Osu Keyboard Sounds"
-    },
-    {
-      type: "separator"
-    },
-    {
-      label: "Is Active",
-      click(menuItem) {
-        setIsActive(menuItem.checked);
-        showNotification(`Sounds are ${menuItem.checked ? "enabled" : "disabled"}!`, true);
-      },
-      type: "checkbox",
-      checked: isActive
-    },
-    {
-      type: "separator"
-    },
-    {
-      label: "Exit",
-      type: "normal",
-      role: "quit"
+  settingsWindow = new BrowserWindow({
+    width: 260,
+    height: 360,
+    x: 0,
+    y: 0,
+    title: "Osu Keyboard Sounds - Settings",
+    resizable: false,
+    frame: false,
+    darkTheme: true,
+    alwaysOnTop: true,
+    transparent: true,
+    webPreferences: {
+      nodeIntegration: true,
+      autoplayPolicy: "no-user-gesture-required",
+      contextIsolation: false
     }
-  ])
+  });
+
+  ipcMain.on("settings", (_, cfg) => {
+    audioWindow.webContents.send("settings", cfg);
+  });
+
+  ipcMain.on("quit", () => {
+    app.quit();
+  })
+
+  settingsWindow.loadURL("http://127.0.0.1:8434/settings.html");
+  settingsWindow.hide();
+
+  tray = new Tray(path.resolve(__dirname, "icon.ico"))
   tray.setToolTip("Osu Keyboard Sounds");
-  tray.setContextMenu(contextMenu);
-
-  globalUserInput.events.on("data", (eventData) => {
-    if (eventData.event == "keyboardStateChange" && eventData.keyState == "Down") {
-      mainWindow.webContents.send("keydown", eventData.keyCode);
+  tray.on("right-click", (event, bounds) => {
+    settingsWindow.setPosition(bounds.x - settingsWindow.getSize()[0], bounds.y - settingsWindow.getSize()[1], false);
+    if (settingsWindow.isVisible()) {
+      settingsWindow.hide();
+    } else {
+      settingsWindow.show();
     }
+  })
+  settingsWindow.on("blur", () => {
+    settingsWindow.hide();
+  })
 
+  globalUserInput.on("keyboard:keydown", ({ key }) => {
+    audioWindow.webContents.send("keydown", key);
   })
   globalUserInput.listen();
 
-  showNotification("Hey i am at application tray!");
-});
-
-app.on('window-all-closed', () => {
-  app.quit();
+  showNotification("Hey I am at application tray!", true);
 });
 
 function showNotification(body = "", silent = false, timeout = 3500) {
@@ -85,7 +93,7 @@ function showNotification(body = "", silent = false, timeout = 3500) {
     title: "Osu Keyboard Sounds",
     body,
     silent,
-    timeoutType: "never"
+    timeoutType: 'default'
   });
 
   notification.show();
