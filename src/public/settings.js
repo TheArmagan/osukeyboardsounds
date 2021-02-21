@@ -17,8 +17,5 @@ const vueApp = new Vue({
     quit() {
       ipcRenderer.send("quit");
     }
-  },
-  watch: {
-
   }
 })

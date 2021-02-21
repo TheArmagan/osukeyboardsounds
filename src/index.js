@@ -1,10 +1,12 @@
-const { app, BrowserWindow, Tray, Notification } = require('electron');
+const { app, BrowserWindow, Tray, Notification, Menu } = require('electron');
 const path = require('path');
 const globalUserInput = require("globaluserinput");
 const express = require("express");
 const expressApp = express();
 const { ipcMain } = require("electron");
 const AutoLaunch = require('auto-launch');
+
+const ICON_PATH = path.resolve(__dirname, "icon.ico");
 
 expressApp.listen(8434);
 expressApp.use(express.static(path.resolve(__dirname, "public")));
@@ -31,13 +33,13 @@ app.on('ready', () => {
     height: 1,
     x: 0,
     y: 0,
-    title: "Osu! Keyboard Sounds - Audio",
     darkTheme: true,
     webPreferences: {
       nodeIntegration: true,
       autoplayPolicy: "no-user-gesture-required",
       contextIsolation: false
-    }
+    },
+    icon: ICON_PATH
   });
 
   audioWindow.loadURL("http://127.0.0.1:8434/audio.html");
@@ -48,7 +50,6 @@ app.on('ready', () => {
     height: 360,
     x: 0,
     y: 0,
-    title: "Osu! Keyboard Sounds - Settings",
     resizable: false,
     frame: false,
     darkTheme: true,
@@ -58,7 +59,8 @@ app.on('ready', () => {
       nodeIntegration: true,
       autoplayPolicy: "no-user-gesture-required",
       contextIsolation: false
-    }
+    },
+    icon: ICON_PATH
   });
 
   ipcMain.on("settings", async (_, cfg) => {
@@ -85,9 +87,9 @@ app.on('ready', () => {
   settingsWindow.loadURL("http://127.0.0.1:8434/settings.html");
   settingsWindow.hide();
 
-  tray = new Tray(path.resolve(__dirname, "icon.ico"))
+  tray = new Tray(ICON_PATH);
   tray.setToolTip("Osu! Keyboard Sounds");
-  tray.on("right-click", (event, bounds) => {
+  tray.on("click", (event, bounds) => {
     settingsWindow.setPosition(bounds.x - settingsWindow.getSize()[0], bounds.y - settingsWindow.getSize()[1], false);
     if (settingsWindow.isVisible()) {
       settingsWindow.hide();
@@ -98,6 +100,12 @@ app.on('ready', () => {
   settingsWindow.on("blur", () => {
     settingsWindow.hide();
   })
+  tray.setContextMenu(Menu.buildFromTemplate([
+    {
+      role: "quit",
+      label: "Quit"
+    }
+  ]))
 
   globalUserInput.on("keyboard:keydown", ({ key }) => {
     audioWindow.webContents.send("keydown", key);
