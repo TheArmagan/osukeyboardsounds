@@ -4,6 +4,7 @@ const globalUserInput = require("globaluserinput");
 const express = require("express");
 const expressApp = express();
 const { ipcMain } = require("electron");
+const AutoLaunch = require('auto-launch');
 
 expressApp.listen(8434);
 expressApp.use(express.static(path.resolve(__dirname, "public")));
@@ -12,6 +13,11 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
+
+let autoStart = new AutoLaunch({
+  name: "Osu! Keyboard Sounds",
+  isHidden: true
+});
 
 /** @type {Tray} */
 let tray = null;
@@ -25,7 +31,7 @@ app.on('ready', () => {
     height: 1,
     x: 0,
     y: 0,
-    title: "Osu Keyboard Sounds - Audio",
+    title: "Osu! Keyboard Sounds - Audio",
     darkTheme: true,
     webPreferences: {
       nodeIntegration: true,
@@ -42,7 +48,7 @@ app.on('ready', () => {
     height: 360,
     x: 0,
     y: 0,
-    title: "Osu Keyboard Sounds - Settings",
+    title: "Osu! Keyboard Sounds - Settings",
     resizable: false,
     frame: false,
     darkTheme: true,
@@ -55,8 +61,21 @@ app.on('ready', () => {
     }
   });
 
-  ipcMain.on("settings", (_, cfg) => {
+  ipcMain.on("settings", async (_, cfg) => {
     audioWindow.webContents.send("settings", cfg);
+
+    if (cfg.hasOwnProperty("autoStart")) {
+      let isEnabled = await autoStart.isEnabled();
+      if (cfg.autoStart != isEnabled) {
+        if (cfg.autoStart) {
+          await autoStart.enable();
+          showNotification("Auto start activated!", true);
+        } else {
+          await autoStart.disable();
+          showNotification("Auto start deactivated!", true);
+        }
+      }
+    }
   });
 
   ipcMain.on("quit", () => {
@@ -67,7 +86,7 @@ app.on('ready', () => {
   settingsWindow.hide();
 
   tray = new Tray(path.resolve(__dirname, "icon.ico"))
-  tray.setToolTip("Osu Keyboard Sounds");
+  tray.setToolTip("Osu! Keyboard Sounds");
   tray.on("right-click", (event, bounds) => {
     settingsWindow.setPosition(bounds.x - settingsWindow.getSize()[0], bounds.y - settingsWindow.getSize()[1], false);
     if (settingsWindow.isVisible()) {
@@ -90,7 +109,7 @@ app.on('ready', () => {
 
 function showNotification(body = "", silent = false, timeout = 3500) {
   let notification = new Notification({
-    title: "Osu Keyboard Sounds",
+    title: "Osu! Keyboard Sounds",
     body,
     silent,
     timeoutType: 'default'

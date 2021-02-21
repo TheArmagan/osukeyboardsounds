@@ -2,7 +2,7 @@
   "name": "osukeyboardsounds",
   "productName": "osukeyboardsounds",
   "version": "1.0.0",
-  "description": "Osu keyboard sounds on your desktop!",
+  "description": "Osu! Keyboard Sounds on your desktop!",
   "main": "src/index.js",
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
@@ -17,6 +17,7 @@
   },
   "license": "GNU GLP v3",
   "dependencies": {
+    "auto-launch": "^5.0.5",
     "electron-squirrel-startup": "^1.0.0",
     "express": "^4.17.1",
     "globaluserinput": "^1.0.0"

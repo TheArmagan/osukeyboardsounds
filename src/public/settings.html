@@ -15,112 +15,76 @@
       font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
         "Lucida Sans", Arial, sans-serif;
       outline: 0;
+      overflow: hidden;
     }
 
     html,
     body {
-      width: 100vw;
-      height: 100vh;
-      border-radius: 9999px;
+      width: 100%;
+      height: 100%;
+      background-color: transparent;
     }
 
     body {
-      background-color: #202020;
-      border-radius: 9999px;
+      padding: 8px;
     }
 
-    main {
-      margin: 0 auto;
-      padding-top: 16px;
-      max-width: 90vw;
+    #vue-app {
       width: 100%;
+      height: 100%;
+      border-radius: 6px;
+      background-color: #ff72a6df;
+      border: 8px solid #ffb0cddf;
+      padding: 8px;
+      box-shadow: 0px 0px 6px 2px #ffb0cd91;
     }
 
-    nav {
-      width: 100vw;
-      height: 24px;
-    }
-
-    .title {
-      color: whitesmoke;
+    #title {
       text-align: center;
-      line-height: 24px;
-      font-size: 18px;
-    }
-
-    .volume-range {
-      display: block;
-      width: 100%;
-      background-color: #555555;
-      border-top-right-radius: 4px;
-      border-top-left-radius: 4px;
-    }
-
-    .volume-range::-webkit-slider-runnable-track {
-      padding: 2px;
-      background-color: #4b4b4b;
-      border-top-right-radius: 4px;
-      border-top-left-radius: 4px;
-    }
-
-    .volume-display {
-      padding: 2px;
-      display: block;
-      width: 100%;
-      background-color: #555555;
-      height: 18px;
-      border-bottom-right-radius: 4px;
-      border-bottom-left-radius: 4px;
-    }
-
-    .volume-display p {
-      width: 100%;
-      line-height: 18px;
       color: whitesmoke;
-      text-align: center;
+      font-size: 22px;
     }
 
-    .button {
-      border-radius: 4px;
-      cursor: pointer;
+    #settings {
+      margin-top: 16px;
+    }
+
+    .setting {
+      border-left: 4px solid#ffb0cddf;
+      background-color: #ffb0cda2;
+      padding: 8px;
+    }
+
+    .setting p {
+      color: rgb(22, 14, 20);
+      margin-bottom: 2px;
+    }
+
+    .setting:not(:first-child) {
       margin-top: 8px;
-      width: 100%;
-      height: 24px;
-      background-color: #555555;
-      color: whitesmoke;
-      border: 0;
     }
-
-    .button:hover {
-      background-color: #616161;
-    }
-
-    .button:active {
-      background-color: #4d4d4d;
-    }
-
-
   </style>
 </head>
 
 <body>
   <div id="vue-app">
-    <nav>
-      <p class="title">Osu Keyboard Sounds</h1>
-    </nav>
-    <main>
-      <div class="volume">
-        <input class="volume-range" type="range" step="0.01" max="1" min="0" v-model.number="config.volume">
-        <div class="volume-display">
-          <p>Volume: {{Math.floor(config.volume*100)}}</p>
-        </div>
+    <div id="title">
+      Osu! Keyboard Sounds
+    </div>
+    <div id="settings">
+      <div class="setting">
+        <p>Volume ({{(config.volume*100).toFixed(0)}})</p>
+        <input type="range" style="width: 100%;" min="0" max="1" step="0.01" v-model.number="config.volume">
       </div>
-      <button class="button" @click="save()">{{saveButtonText}}</button>
-      <button class="button" @click="quit()">Quit App</button>
-    </main>
+      <div class="setting">
+        <p>Start With Windows</p>
+        <input type="checkbox" style="width: 100%;" v-model="config.autoStart">
+      </div>
+    </div>
   </div>
   <script src="./lib/vue2dev.js"></script>
   <script src="./lib/config.js"></script>
+  <script src="./lib/debounce.js"></script>
   <script src="./settings.js"></script>
 </body>
 

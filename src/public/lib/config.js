@@ -1,7 +1,8 @@
 class ConfigManager {
 
   #defaults = {
-    volume: 0.5
+    volume: 0.5,
+    autoStart: false
   }
 
   getDefault(key) {

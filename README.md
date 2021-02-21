@@ -1,2 +1,2 @@
 # osukeyboardsounds
-Osu keyboard sounds on your desktop!
+Osu! Keyboard Sounds on your desktop!

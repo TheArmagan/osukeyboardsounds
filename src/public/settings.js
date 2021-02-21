@@ -2,25 +2,23 @@ const { ipcRenderer } = require("electron");
 const vueApp = new Vue({
   el: "#vue-app",
   data: {
-    config: {},
-    saveButtonText: "Save"
+    config: {}
   },
   mounted() {
+    this.$watch("config", debounce(function (conf) {
+      conf = { ...conf };
+      console.log(conf)
+      config.setAll(conf);
+      ipcRenderer.send("settings", conf);
+    }, 100), { deep: true })
     this.config = config.getAll();
-    ipcRenderer.send("settings", { ...this.config });
   },
   methods: {
-    save() {
-      let conf = { ...this.config };
-      config.setAll(conf);
-      this.saveButtonText = "Saved!";
-      setTimeout(() => {
-        this.saveButtonText = "Save";
-      }, 1000);
-      ipcRenderer.send("settings", conf);
-    },
     quit() {
       ipcRenderer.send("quit");
     }
+  },
+  watch: {
+
   }
 })
